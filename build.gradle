@@ -46,6 +46,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("ch.qos.logback:logback-core:1.2.3")
 
+    // To build a CLI
+    implementation('info.picocli:picocli:4.2.0')
 }
 
 test {
@@ -57,7 +59,8 @@ test {
 
 application {
     // Define the main class for the application.
-    mainClassName = 'dmncli.App'
+    // mainClassName = 'dmncli.App'
+    mainClassName = 'dmncli.CheckSum'
 }
 
 //No promises on getting this to work for all platforms yet
