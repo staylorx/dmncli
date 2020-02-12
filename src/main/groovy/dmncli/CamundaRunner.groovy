@@ -13,12 +13,15 @@ import org.camunda.bpm.model.dmn.Dmn
 import org.camunda.bpm.model.dmn.DmnModelException
 import org.camunda.bpm.model.dmn.DmnModelInstance
 import org.camunda.bpm.model.xml.ModelValidationException
-import org.slf4j.Logger
+import ch.qos.logback.classic.Logger
 import org.slf4j.LoggerFactory
 
 /*
-TODO implement graph to check for valid decisionKeys => __BAD_DECISION_KEY__
-TODO process entire array of inputs instead of just the first one
+ * A 100% json/string wrapper around a DMN engine.
+ *
+ *
+ * TODO implement graph to check for valid decisionKeys => __BAD_DECISION_KEY__
+*  TODO process entire array of inputs instead of just the first one
  */
 class CamundaRunner {
 
@@ -47,23 +50,29 @@ class CamundaRunner {
 
     def loadDmnFile(String dmnFilePath) {
         logger.debug("Setting DMN file to ${dmnFilePath}")
-        new File(dmnFilePath).withInputStream { stream ->
-            try {
-                this.dmnModelInstance = Dmn.readModelFromStream(stream)
+        try {
+            new File(dmnFilePath).withInputStream { stream ->
                 try {
-                    Dmn.validateModel(dmnModelInstance)
-                    this.decisionRequirementsGraph = dmnEngine.parseDecisionRequirementsGraph(dmnModelInstance)
+                    this.dmnModelInstance = Dmn.readModelFromStream(stream)
+                    try {
+                        Dmn.validateModel(dmnModelInstance)
+                        this.decisionRequirementsGraph = dmnEngine.parseDecisionRequirementsGraph(dmnModelInstance)
+                    }
+                    catch (ModelValidationException e) {
+                        logger.error("Model won't validated: ${e.message}")
+                        return createErrorJson("__WONT_VALIDATE_", "${e.message}")
+                    }
                 }
-                catch (ModelValidationException e) {
-                    logger.error("Model won't validated: ${e.message}")
-                    return createErrorJson("__WONT_VALIDATE_", "${e.message}")
+                catch (DmnModelException ex) {
+                    logger.error("Model can't be opened from file: ${ex.message}")
+                    return createErrorJson("__BAD_MODEL_READ_", "${ex.message}")
                 }
-            }
-            catch (DmnModelException ex) {
-                logger.error("Model can't be opened from file: ${ex.message}")
-                return createErrorJson("__BAD_MODEL_READ_", "${ex.message}")
-            }
 
+            }
+        }
+        catch (FileNotFoundException e) {
+            logger.error("The file cannot be found or opened: ${e.message}")
+            return createErrorJson("__BAD_FILE_", "${e.message}")
         }
     }
 

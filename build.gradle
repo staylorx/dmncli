@@ -33,7 +33,9 @@ dependencies {
     // Use the Camunda DMN engine
     implementation(platform("org.camunda.bpm.dmn:camunda-engine-dmn-bom:7.12.0"))
     implementation("org.camunda.bpm.dmn:camunda-engine-dmn")
-    implementation("dom4j:dom4j:1.6.1")
+    // implementation("dom4j:dom4j:1.6.1")
+
+    implementation('commons-io:commons-io:2.6')
 
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("ch.qos.logback:logback-classic:1.2.3")
