@@ -1,5 +1,6 @@
 package dmncli
 
+import groovy.json.JsonException
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph
@@ -66,7 +67,7 @@ class CamundaRunner {
         }
     }
 
-    private static String createErrorJson(code, message) {
+    private static String createErrorJson(String code, String message) {
 
         def map = [:]
         map['code'] = code
@@ -95,9 +96,20 @@ class CamundaRunner {
             return createErrorJson("__NO_DMN_MODEL__","No model loaded.")
         }
 
-        def inputList = jsonSlurper.parseText(variablesJson)
+        def inputList
+        try {
+            inputList = jsonSlurper.parseText(variablesJson)
+        }
+        catch (IllegalArgumentException e) {
+            logger.error("Input JSON is empty?")
+            return createErrorJson("__EMPTY_JSON__","Bad JSON input.")
+        }
+        catch (JsonException e) {
+            logger.error("Input JSON is poorly formed.")
+            return createErrorJson("__FUNKY_JSON__","Bad JSON input.")
+        }
 
-        //TODO build an exception class and move these out
+        //TODO build an exception class and move these out?
         if (inputList instanceof List) {
             //fine... move along quietly
         } else {
