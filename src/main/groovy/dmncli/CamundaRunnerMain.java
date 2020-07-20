@@ -64,7 +64,7 @@ class CamundaRunnerMain implements Callable<Integer> {
 
         if (outputVarFile != null) {
             try {
-                FileUtils.writeStringToFile(outputVarFile, resultJsonString);
+                FileUtils.writeStringToFile(outputVarFile, resultJsonString, StandardCharsets.UTF_8);
                 logger.info("Output written to " + outputVarFile.getAbsolutePath());
             } catch (Exception e) {
                 logger.error(e.getMessage());
