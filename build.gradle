@@ -1,53 +1,62 @@
 plugins {
-    // Apply the groovy plugin to add support for Groovy
     id 'groovy'
 
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
 
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
-    id 'edu.sc.seis.launch4j' version '2.4.6'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'edu.sc.seis.launch4j' version '2.4.9'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
 }
 
 repositories {
     mavenLocal()
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'org.codehaus.groovy:groovy-all:3.0.4'
-    testImplementation 'org.spockframework:spock-core:2.0-M2-groovy-3.0'
-
-    // Use the Camunda DMN engine
-    implementation(platform("org.camunda.bpm.dmn:camunda-engine-dmn-bom:7.13.0"))
+    implementation('org.codehaus.groovy:groovy-all:3.0.8')
+    implementation(platform("org.camunda.bpm.dmn:camunda-engine-dmn-bom:7.15.0"))
     implementation("org.camunda.bpm.dmn:camunda-engine-dmn")
-    // implementation("dom4j:dom4j:1.6.1")
-
-    implementation('commons-io:commons-io:2.7')
-
+    implementation('commons-io:commons-io:2.8.0')
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("ch.qos.logback:logback-core:1.2.3")
+    implementation('info.picocli:picocli:4.6.1')
 
-    // To build a CLI
-    implementation('info.picocli:picocli:4.4.0')
+    testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
+    testImplementation('org.spockframework:spock-core:2.0-M5-groovy-3.0')
+    testImplementation('junit:junit:4.13')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = [] // don't compile Java code twice
+        }
+        groovy {
+            srcDirs = [ 'src/main/groovy', 'src/main/java' ]
+        }
+    }
 }
 
 test {
     testLogging {
+        useJUnitPlatform()
         showStandardStreams = true
         testLogging.exceptionFormat = 'full'
     }
+    //reports {
+    //    junitXml.enabled = false
+    //    html.enabled = true
+    //}               
 }
 
 application {
-    // Define the main class for the application.
-    // mainClassName = 'dmncli.App'
     mainClassName = 'dmncli.CamundaRunnerMain'
 }
 
