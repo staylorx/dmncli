@@ -15,6 +15,7 @@ import org.camunda.bpm.model.dmn.DmnModelInstance
 import org.camunda.bpm.model.xml.ModelValidationException
 import ch.qos.logback.classic.Logger
 import org.slf4j.LoggerFactory
+import groovy.transform.NullCheck
 
 /*
  * A 100% json/string wrapper around a DMN engine.
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory
  * TODO implement graph to check for valid decisionKeys => __BAD_DECISION_KEY__
 *  TODO process entire array of inputs instead of just the first one
  */
+@NullCheck
 class CamundaRunner {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass())
@@ -137,7 +139,11 @@ class CamundaRunner {
         try {
             def decision = dmnEngine.parseDecision(decisionKey, dmnModelInstance)
             def decisionTableResult = dmnEngine.evaluateDecisionTable(decision, variableMap)
-            return JsonOutput.toJson(decisionTableResult.resultList)
+            if (decisionTableResult) {
+                return JsonOutput.toJson(decisionTableResult.resultList)
+            } else {
+                return createErrorJson("__EMPTY_RESULT__","The output decision is empty.")
+            }
         }
         catch (DmnTransformException e) {
             logger.error("Unable to parse or transform the decision: ${e.message}")

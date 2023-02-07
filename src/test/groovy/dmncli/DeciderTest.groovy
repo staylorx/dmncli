@@ -93,14 +93,14 @@ class DeciderTest extends Specification {
         def resultJsonString = camundaRunner.decideTable(dmnFilePath, "decision", variables)
         def result = jsonSlurper.parseText(resultJsonString)
         if (result.size == 0) {
-            //an empty results comes back as just that... and empty ArrayList
-            result[0] = ["code":null]
+            //an empty results is marked as such
+            result[0] = ["code":"__EMPTY_RESULT__"]
         }
         result[0].code == code
 
         where:
         season    | guestCount || code
-        "Arizona" | 4          || null
+        "Arizona" | 4          || "__EMPTY_RESULT__"
         "Spring"  | true       || "__ENGINE_ERROR__"
         99.8      | "four"     || "__ENGINE_ERROR__"
 

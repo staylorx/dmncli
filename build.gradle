@@ -4,13 +4,20 @@ plugins {
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
 
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'edu.sc.seis.launch4j' version '2.4.9'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'edu.sc.seis.launch4j' version '2.5.4'
+
+    id "nebula.lint" version "18.0.1"
+}
+
+allprojects {
+  apply plugin: 'nebula.lint'
+  gradleLint.rules = ['all-dependency']
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
@@ -19,18 +26,20 @@ repositories {
 }
 
 dependencies {
-    implementation('org.codehaus.groovy:groovy-all:3.0.8')
-    implementation(platform("org.camunda.bpm.dmn:camunda-engine-dmn-bom:7.15.0"))
+    implementation('org.apache.groovy:groovy-all:4.0.8')
+    implementation(platform("org.camunda.bpm.dmn:camunda-engine-dmn-bom:7.18.0"))
     implementation("org.camunda.bpm.dmn:camunda-engine-dmn")
-    implementation('commons-io:commons-io:2.8.0')
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("ch.qos.logback:logback-core:1.2.3")
-    implementation('info.picocli:picocli:4.6.1')
+    implementation('commons-io:commons-io:2.11.0')
+    implementation("org.slf4j:slf4j-api:2.0.6")
+    implementation("ch.qos.logback:logback-classic:1.4.5")
+    implementation('info.picocli:picocli:4.7.1')
+    implementation 'org.apache.groovy:groovy-json:4.0.8'
+    implementation 'org.apache.groovy:groovy:4.0.8'
+    implementation 'org.camunda.bpm.model:camunda-dmn-model:7.18.0'
+    implementation 'org.camunda.bpm.model:camunda-xml-model:7.18.0'
+    implementation 'org.camunda.commons:camunda-commons-typed-values:7.18.0'
 
-    testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
-    testImplementation('org.spockframework:spock-core:2.0-M5-groovy-3.0')
-    testImplementation('junit:junit:4.13')
+    testImplementation('org.spockframework:spock-core:2.4-M1-groovy-4.0')
 }
 
 sourceSets {
@@ -57,7 +66,8 @@ test {
 }
 
 application {
-    mainClassName = 'dmncli.CamundaRunnerMain'
+    getMainClass().set('dmncli.CamundaRunnerMain')
+    mainClassName = 'dmncli.CamundaRunnerMain' //jengelman's shadowbase plugin needs this
 }
 
 launch4j {
